@@ -1,3 +1,5 @@
+import connectDB from "@/lib/db";
+import KYC from "@/schemas/kyc";
 import { writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
@@ -15,6 +17,13 @@ export async function POST(request: NextRequest) {
   if (!cardIdFront || !cardIdBack) {
     return NextResponse.json(
       { message: "Card ID files are required" },
+      { status: 400 }
+    );
+  }
+
+  if (!selfie) {
+    return NextResponse.json(
+      { message: "Selfie file is required" },
       { status: 400 }
     );
   }
@@ -39,6 +48,19 @@ export async function POST(request: NextRequest) {
     await writeFile(cardIdFrontPath, cardIdFrontBuffer);
     await writeFile(cardIdBackPath, cardIdBackBuffer);
     console.log("Files uploaded successfully");
+
+    await connectDB();
+
+    const newKyc = new KYC({
+      userId: "1",
+      cardIdFront: cardIdFrontPath,
+      cardIdBack: cardIdBackPath,
+      selfieImage: selfie,
+    });
+
+    await newKyc.save();
+
+    console.log("KYC saved successfully");
 
     return NextResponse.json({ message: "Files uploaded successfully" });
   } catch (error) {
