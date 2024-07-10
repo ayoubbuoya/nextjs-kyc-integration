@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { toast } from "react-toastify";
 import Webcam from "react-webcam";
 
 export default function CardIdForm() {
@@ -76,9 +77,10 @@ export default function CardIdForm() {
           body: formData,
         });
         if (response.ok) {
-          alert("Files uploaded successfully");
+          toast.success("Files uploaded successfully");
         } else {
-          alert("Failed to upload files");
+          toast.error("Failed to upload files");
+          console.error(response);
         }
       } catch (error) {
         console.error(error);
